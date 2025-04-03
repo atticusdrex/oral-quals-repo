@@ -1,4 +1,4 @@
-from gaussianproccess import * 
+from gaussianprocess import * 
 from sklearn.preprocessing import StandardScaler
 
 class MultiFidelityRegressor:
