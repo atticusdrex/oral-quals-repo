@@ -15,3 +15,7 @@ This package is designed to implement and compare several surrogate modeling tec
 * NARGP: Nonlinear autoregressive Gaussian Process.
 * Hyperkriging: A novel method that incorporates all low-fidelity function evaluations as features to predict the high-fidelity output.
 
+**Example Notebook**
+
+The `TestNotebook.ipynb` file was used to create the visuals generated in the written documentation and features example usage of the `gaussianprocess` package and the `multifitoolbox` package. 
+
