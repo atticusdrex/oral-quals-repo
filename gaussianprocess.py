@@ -300,7 +300,7 @@ class GaussianProcess:
             else:
                 stagnation_count += 1
             
-            # Break if we have not improved in 10 steps
+            # Break if we have not improved in 250 steps
             if stagnation_count > 250:
                 print("No Improvements Made! Breaking Loop...")
                 break
