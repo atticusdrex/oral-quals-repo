@@ -26,7 +26,8 @@ def rbf_kernel(x1, x2, kernel_params):
     a scalar evaluating the RBF kernel at these two inputs 
     """
     h = (x1-x2).ravel()
-    return jnp.exp(-h.T @ jnp.diag(kernel_params**(-1)) @ h)
+
+    return jnp.exp(-jnp.sum(h**2 / kernel_params))
 
 # Gaussian Process Regression Class 
 def K(X1, X2, kernel_func, kernel_params):
@@ -82,17 +83,18 @@ def loss(p, kernel_func, X, Y, noise_var):
     """
 
     Ktrain = K(X, X, kernel_func, p['kernel_params']) + noise_var * jnp.eye(X.shape[1])
+    jnp.linalg.cond(Ktrain)
     # Compute the scalar log-likelihood
     L = jnp.linalg.cholesky(Ktrain)
     logdet = 2.0 * jnp.sum(jnp.log(jnp.diag(L)))
-    quadratic_term = Y.T @ jnp.linalg.solve(Ktrain, Y) # Solve for (Ktrain^-1 f)
+    quadratic_term = Y.T @ jax.scipy.linalg.cho_solve((L, True), Y) # Solve for (Ktrain^-1 f)
 
     # Combine terms into a scalar
     loss = 0.5*(quadratic_term + logdet)
 
     return loss.squeeze()  # Ensure the input is a scalar
 
-def adam_step(params, grads, lr, t, m, v, beta1=0.9, beta2=0.999, epsilon=1e-8):
+def adam_step(params, grads, lr, t, m, v, beta1=0.99, beta2=0.9999, epsilon=1e-8):
     """
     Perform a single optimization step using the ADAM algorithm.
 
@@ -194,6 +196,11 @@ class GaussianProcess:
 
         # Compute the training matrix 
         self.Ktrain = K(self.X, self.X, self.kernel_func, self.kernel_params) + noise_var * jnp.eye(self.X.shape[1])
+
+        cond_num = jnp.linalg.cond(self.Ktrain)
+        # Check condition number of kernel matrix 
+        if cond_num > 1e8:
+            print("Warning! Kernel Matrix is close to singular: K=%d" % (int(cond_num)))
 
         # Compute weights by solving linear system
         self.alpha = jnp.linalg.lstsq(self.Ktrain, self.Y, rcond=self.rcond)[0]
@@ -301,7 +308,7 @@ class GaussianProcess:
                 stagnation_count += 1
             
             # Break if we have not improved in 10 steps
-            if stagnation_count > 250:
+            if stagnation_count > 500:
                 print("No Improvements Made! Breaking Loop...")
                 break
 
