@@ -94,7 +94,7 @@ def loss(p, kernel_func, X, Y, noise_var):
 
     return loss.squeeze()  # Ensure the input is a scalar
 
-def adam_step(params, grads, lr, t, m, v, beta1=0.99, beta2=0.9999, epsilon=1e-8):
+def adam_step(params, grads, lr, t, m, v, beta1=0.9, beta2=0.999, epsilon=1e-8):
     """
     Perform a single optimization step using the ADAM algorithm.
 
@@ -310,6 +310,11 @@ class GaussianProcess:
             # Break if we have not improved in 10 steps
             if stagnation_count > 500:
                 print("No Improvements Made! Breaking Loop...")
+                break
+
+            # Break if the learning rate is zero to working precision
+            if lr < 3e-16:
+                print("Learning-Rate is at machine precision...")
                 break
 
             
