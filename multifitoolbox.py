@@ -334,10 +334,6 @@ class Hyperkriging(MultiFidelityRegressor):
             # Vertically concatenating the input features 
             test_inputs = np.vstack(input_list)
 
-            # Scaling the test inputs
-            scaler = self.model_params[k-1]['scaler']
-            # test_inputs = scaler.transform(test_inputs.T).T
-
             # Making the model prediction at this fidelity-level 
             Yhat, std = self.model_params[k-1]['model'].predict(test_inputs, include_std = True)
         

@@ -83,7 +83,6 @@ def loss(p, kernel_func, X, Y, noise_var):
     """
 
     Ktrain = K(X, X, kernel_func, p['kernel_params']) + noise_var * jnp.eye(X.shape[1])
-    jnp.linalg.cond(Ktrain)
     # Compute the scalar log-likelihood
     L = jnp.linalg.cholesky(Ktrain)
     logdet = 2.0 * jnp.sum(jnp.log(jnp.diag(L)))
