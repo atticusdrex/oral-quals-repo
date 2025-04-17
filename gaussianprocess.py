@@ -108,7 +108,7 @@ def loss(p, kernel_func, X, Y, noise_var):
     # Compute the scalar log-likelihood
     L = jnp.linalg.cholesky(Ktrain)
     logdet = 2.0 * jnp.sum(jnp.log(jnp.diag(L)))
-    quadratic_term = Y.T @ jax.scipy.linalg.cho_solve((L, True), Y) # Solve for (Ktrain^-1 f)
+    quadratic_term = Y.T @ jax.scipy.linalg.cho_solve((L, True), Y) # Solve for (f.T Ktrain^-1 f)
 
     # Combine terms into a scalar
     loss = 0.5*(quadratic_term + logdet)
@@ -328,8 +328,8 @@ class GaussianProcess:
             else:
                 stagnation_count += 1
             
-            # Break if we have not improved in 10 steps
-            if stagnation_count > 500:
+            # Break if we have not improved in 100 steps
+            if stagnation_count > 100:
                 print("No Improvements Made! Breaking Loop...")
                 break
 
